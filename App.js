@@ -1,5 +1,13 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  TextInput,
+  ScrollView,
+  Alert,
+} from 'react-native';
 import { theme } from './colors';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -39,13 +47,20 @@ export default function App() {
     setText('');
   };
 
-  const deleteToDo = async key => {
-    const newToDos = { ...toDos };
-
-    delete newToDos[key];
-
-    setToDos(newToDos);
-    await saveToDos(newToDos);
+  const deleteToDo = key => {
+    Alert.alert('Delete To Do', 'R U sure?', [
+      { text: 'Cancel' },
+      {
+        text: 'OK',
+        style: 'destructive',
+        onPress: async () => {
+          const newToDos = { ...toDos };
+          delete newToDos[key];
+          setToDos(newToDos);
+          await saveToDos(newToDos);
+        },
+      },
+    ]);
   };
 
   return (
