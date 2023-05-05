@@ -40,6 +40,15 @@ export default function App() {
         placeholder={working ? 'Add a To Do' : 'Where do U want to go?'}
         style={styles.input}
       />
+      <ScrollView>
+        {Object.keys(toDos).map((key, index) =>
+          toDos[key].working === working ? (
+            <View style={styles.toDo} key={key}>
+              <Text style={styles.toDoText}>{toDos[key].text}</Text>
+            </View>
+          ) : null,
+        )}
+      </ScrollView>
     </View>
   );
 }
