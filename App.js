@@ -39,7 +39,14 @@ export default function App() {
     setText('');
   };
 
-  const deleteToDo = id => {};
+  const deleteToDo = async key => {
+    const newToDos = { ...toDos };
+
+    delete newToDos[key];
+
+    setToDos(newToDos);
+    await saveToDos(newToDos);
+  };
 
   return (
     <View style={styles.container}>
@@ -65,7 +72,7 @@ export default function App() {
           toDos[key].working === working ? (
             <View style={styles.toDo} key={key}>
               <Text style={styles.toDoText}>{toDos[key].text}</Text>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => deleteToDo(key)}>
                 <Text>❌</Text>
               </TouchableOpacity>
             </View>
