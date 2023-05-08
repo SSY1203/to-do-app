@@ -53,7 +53,7 @@ export default function App() {
     if (text === '') return;
 
     // const newToDos = Object.assign({}, toDos, { [Date.now()]: { text, work: working } });
-    const newToDos = { ...toDos, [Date.now()]: { text, working } };
+    const newToDos = { ...toDos, [Date.now()]: { text, working, completed: false } };
     setToDos(newToDos);
     await saveData(working, newToDos);
     setText('');
@@ -69,10 +69,18 @@ export default function App() {
           const newToDos = { ...toDos };
           delete newToDos[key];
           setToDos(newToDos);
-          await saveToDos(newToDos);
+          await saveData(newToDos);
         },
       },
     ]);
+  };
+
+  const completeToDo = async key => {
+    const newToDos = { ...toDos };
+    const completeState = newToDos[key].completed;
+    newToDos[key] = { ...newToDos[key], completed: !completeState };
+    setToDos(newToDos);
+    await saveData(newToDos);
   };
 
   return (
@@ -98,13 +106,28 @@ export default function App() {
         {Object.keys(toDos ? toDos : {}).map((key, index) =>
           toDos[key].working === working ? (
             <View style={styles.toDo} key={key}>
-              <Text style={styles.toDoText}>{toDos[key].text}</Text>
+              <Text
+                style={
+                  toDos[key].completed === true
+                    ? {
+                        ...styles.toDoText,
+                        textDecorationLine: 'line-through',
+                        color: `${theme.toDoBg}`,
+                      }
+                    : styles.toDoText
+                }
+              >
+                {toDos[key].text}
+              </Text>
               <TouchableOpacity onPress={() => deleteToDo(key)}>
-                <Octicons name="pencil" size={24} color="black" />
+                <Octicons name="pencil" size={18} color={theme.toDoBg} />
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => deleteToDo(key)}>
-                <Fontisto name="checkbox-active" size={24} color="black" />
-                <Fontisto name="checkbox-passive" size={24} color="black" />
+              <TouchableOpacity onPress={() => completeToDo(key)}>
+                {toDos[key].completed === true ? (
+                  <Fontisto name="checkbox-active" size={18} color={theme.toDoBg} />
+                ) : (
+                  <Fontisto name="checkbox-passive" size={18} color={theme.toDoBg} />
+                )}
               </TouchableOpacity>
               <TouchableOpacity onPress={() => deleteToDo(key)}>
                 <Fontisto name="trash" size={18} color={theme.toDoBg} />
