@@ -14,6 +14,7 @@ import { Fontisto } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const STORAGE_KEY = '@toDos';
+const LAST_STATE = '@lastState';
 
 export default function App() {
   const [working, setWorking] = useState(true);
@@ -24,18 +25,27 @@ export default function App() {
     loadToDos();
   }, []);
 
-  const travel = () => setWorking(false);
-  const work = () => setWorking(true);
+  const travel = async () => {
+    await setWorking(false);
+    await saveData(!working);
+  };
+  const work = async () => {
+    await setWorking(true);
+    await saveData(!working);
+  };
 
   const onChangeText = payload => setText(payload);
 
-  const saveToDos = async toSave => {
+  const saveData = async (state = working, toSave = toDos) => {
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+    await AsyncStorage.setItem(LAST_STATE, JSON.stringify(state));
   };
 
   const loadToDos = async () => {
     const s = await AsyncStorage.getItem(STORAGE_KEY);
+    const l = await AsyncStorage.getItem(LAST_STATE);
     setToDos(JSON.parse(s));
+    setWorking(JSON.parse(l));
   };
 
   const addToDo = async () => {
@@ -44,7 +54,7 @@ export default function App() {
     // const newToDos = Object.assign({}, toDos, { [Date.now()]: { text, work: working } });
     const newToDos = { ...toDos, [Date.now()]: { text, working } };
     setToDos(newToDos);
-    await saveToDos(newToDos);
+    await saveData(working, newToDos);
     setText('');
   };
 
