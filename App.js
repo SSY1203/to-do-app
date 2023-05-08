@@ -84,7 +84,7 @@ export default function App() {
         style={styles.input}
       />
       <ScrollView>
-        {Object.keys(toDos).map((key, index) =>
+        {Object.keys(toDos ? toDos : {}).map((key, index) =>
           toDos[key].working === working ? (
             <View style={styles.toDo} key={key}>
               <Text style={styles.toDoText}>{toDos[key].text}</Text>
