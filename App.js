@@ -11,6 +11,7 @@ import {
 import { theme } from './colors';
 import { useEffect, useState } from 'react';
 import { Fontisto } from '@expo/vector-icons';
+import { Octicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const STORAGE_KEY = '@toDos';
@@ -98,6 +99,13 @@ export default function App() {
           toDos[key].working === working ? (
             <View style={styles.toDo} key={key}>
               <Text style={styles.toDoText}>{toDos[key].text}</Text>
+              <TouchableOpacity onPress={() => deleteToDo(key)}>
+                <Octicons name="pencil" size={24} color="black" />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => deleteToDo(key)}>
+                <Fontisto name="checkbox-active" size={24} color="black" />
+                <Fontisto name="checkbox-passive" size={24} color="black" />
+              </TouchableOpacity>
               <TouchableOpacity onPress={() => deleteToDo(key)}>
                 <Fontisto name="trash" size={18} color={theme.toDoBg} />
               </TouchableOpacity>
