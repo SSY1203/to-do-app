@@ -1,5 +1,6 @@
 {
-  "editor.fontFamily": "'FiraCode-Retina', 'D2Coding',  monospace",
+  "editor.fontFamily": "'Fira Code', 'D2Coding',  monospace",
+  "editor.fontLigatures": true,
   "editor.tokenColorCustomizations": {
     "comments": "",
     "textMateRules": [

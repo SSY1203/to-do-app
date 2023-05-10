@@ -30,6 +30,7 @@ export default function App() {
     await setWorking(false);
     await saveData(!working);
   };
+
   const work = async () => {
     await setWorking(true);
     await saveData(!working);
@@ -53,7 +54,10 @@ export default function App() {
     if (text === '') return;
 
     // const newToDos = Object.assign({}, toDos, { [Date.now()]: { text, work: working } });
-    const newToDos = { ...toDos, [Date.now()]: { text, working, completed: false } };
+    const newToDos = {
+      ...toDos,
+      [Date.now()]: { text, working, completed: false, editting: false },
+    };
     setToDos(newToDos);
     await saveData(working, newToDos);
     setText('');
@@ -77,8 +81,7 @@ export default function App() {
 
   const completeToDo = async key => {
     const newToDos = { ...toDos };
-    const completeState = newToDos[key].completed;
-    newToDos[key] = { ...newToDos[key], completed: !completeState };
+    newToDos[key] = { ...newToDos[key], completed: true };
     setToDos(newToDos);
     await saveData(newToDos);
   };
@@ -108,7 +111,7 @@ export default function App() {
             <View style={styles.toDo} key={key}>
               <Text
                 style={
-                  toDos[key].completed === true
+                  toDos[key].completed
                     ? {
                         ...styles.toDoText,
                         textDecorationLine: 'line-through',
@@ -119,19 +122,21 @@ export default function App() {
               >
                 {toDos[key].text}
               </Text>
-              <TouchableOpacity onPress={() => deleteToDo(key)}>
-                <Octicons name="pencil" size={18} color={theme.toDoBg} />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => completeToDo(key)}>
-                {toDos[key].completed === true ? (
-                  <Fontisto name="checkbox-active" size={18} color={theme.toDoBg} />
-                ) : (
-                  <Fontisto name="checkbox-passive" size={18} color={theme.toDoBg} />
-                )}
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => deleteToDo(key)}>
-                <Fontisto name="trash" size={18} color={theme.toDoBg} />
-              </TouchableOpacity>
+              <View style={styles.btnList}>
+                <TouchableOpacity onPress={() => deleteToDo(key)}>
+                  <Octicons name="pencil" size={18} color={theme.toDoBg} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => completeToDo(key)}>
+                  {toDos[key].completed === true ? (
+                    <Fontisto name="checkbox-active" size={18} color={'white'} />
+                  ) : (
+                    <Fontisto name="checkbox-passive" size={18} color={theme.toDoBg} />
+                  )}
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => deleteToDo(key)}>
+                  <Fontisto name="trash" size={18} color={theme.toDoBg} />
+                </TouchableOpacity>
+              </View>
             </View>
           ) : null,
         )}
@@ -172,10 +177,17 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    flex: 1,
   },
   toDoText: {
     color: 'white',
     fontSize: 16,
     fontWeight: '500',
+    flex: 5,
+  },
+  btnList: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    flex: 1,
   },
 });
