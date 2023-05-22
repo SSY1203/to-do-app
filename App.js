@@ -73,7 +73,7 @@ export default function App() {
           const newToDos = { ...toDos };
           delete newToDos[key];
           setToDos(newToDos);
-          await saveData(newToDos);
+          await saveData(working, newToDos);
         },
       },
     ]);
@@ -81,9 +81,10 @@ export default function App() {
 
   const completeToDo = async key => {
     const newToDos = { ...toDos };
-    newToDos[key] = { ...newToDos[key], completed: true };
+    const isCompleted = newToDos[key].completed;
+    newToDos[key] = { ...newToDos[key], completed: !isCompleted };
     setToDos(newToDos);
-    await saveData(newToDos);
+    await saveData(working, newToDos);
   };
 
   return (
