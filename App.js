@@ -7,6 +7,7 @@ import {
   TextInput,
   ScrollView,
   Alert,
+  Platform,
 } from 'react-native';
 import { theme } from './colors';
 import { useEffect, useState } from 'react';
@@ -46,8 +47,10 @@ export default function App() {
   const loadToDos = async () => {
     const s = await AsyncStorage.getItem(STORAGE_KEY);
     const l = await AsyncStorage.getItem(LAST_STATE);
-    setToDos(JSON.parse(s));
-    setWorking(JSON.parse(l));
+    if (s && l) {
+      setToDos(JSON.parse(s));
+      setWorking(JSON.parse(l));
+    }
   };
 
   const addToDo = async () => {
@@ -63,20 +66,38 @@ export default function App() {
     setText('');
   };
 
+  const editToDo = async key => {
+    const newToDos = { ...toDos };
+    setText(newToDos[key].text);
+    delete newToDos[key];
+    setToDos(newToDos);
+    await saveData(working, newToDos);
+  };
+
   const deleteToDo = key => {
-    Alert.alert('Delete To Do', 'R U sure?', [
-      { text: 'Cancel' },
-      {
-        text: 'OK',
-        style: 'destructive',
-        onPress: async () => {
-          const newToDos = { ...toDos };
-          delete newToDos[key];
-          setToDos(newToDos);
-          await saveData(working, newToDos);
+    if (Platform.OS === 'web') {
+      const ok = confirm('Do you want to delete this To Do?');
+      if (ok) {
+        const newToDos = { ...toDos };
+        delete newToDos[key];
+        setToDos(newToDos);
+        saveData(working, newToDos);
+      }
+    } else {
+      Alert.alert('Delete To Do', 'R U sure?', [
+        { text: 'Cancel' },
+        {
+          text: 'OK',
+          style: 'destructive',
+          onPress: async () => {
+            const newToDos = { ...toDos };
+            delete newToDos[key];
+            setToDos(newToDos);
+            await saveData(working, newToDos);
+          },
         },
-      },
-    ]);
+      ]);
+    }
   };
 
   const completeToDo = async key => {
@@ -124,16 +145,25 @@ export default function App() {
                 {toDos[key].text}
               </Text>
               <View style={styles.btnList}>
-                <TouchableOpacity onPress={() => deleteToDo(key)}>
-                  <Octicons name="pencil" size={18} color={theme.toDoBg} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => completeToDo(key)}>
-                  {toDos[key].completed === true ? (
-                    <Fontisto name="checkbox-active" size={18} color={'white'} />
-                  ) : (
-                    <Fontisto name="checkbox-passive" size={18} color={theme.toDoBg} />
-                  )}
-                </TouchableOpacity>
+                {toDos[key].completed === true ? (
+                  <>
+                    <TouchableOpacity disabled onPress={() => editToDo(key)}>
+                      <Octicons name="pencil" size={18} color={theme.grey} />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => completeToDo(key)}>
+                      <Fontisto name="checkbox-active" size={18} color={'white'} />
+                    </TouchableOpacity>
+                  </>
+                ) : (
+                  <>
+                    <TouchableOpacity onPress={() => editToDo(key)}>
+                      <Octicons name="pencil" size={18} color={theme.toDoBg} />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => completeToDo(key)}>
+                      <Fontisto name="checkbox-passive" size={18} color={theme.toDoBg} />
+                    </TouchableOpacity>
+                  </>
+                )}
                 <TouchableOpacity onPress={() => deleteToDo(key)}>
                   <Fontisto name="trash" size={18} color={theme.toDoBg} />
                 </TouchableOpacity>
